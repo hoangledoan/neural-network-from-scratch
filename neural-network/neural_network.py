@@ -1,9 +1,11 @@
 import numpy as np
-# import nnfs
-# from nnfs.datasets import spiral_data
+import nnfs
+from nnfs.datasets import spiral_data
+
+nnfs.init()
 
 
-class Dense():
+class Dense:
 
     def __init__(self, n_inputs, n_neurons) -> None:
         self.weights = np.random.randn(n_inputs, n_neurons)
@@ -14,7 +16,7 @@ class Dense():
         self.output = np.dot(inputs_tensor, self.weights) + self.biases
 
 
-class ActivationFunction():
+class ActivationFunction:
 
     def __init__(self) -> None:
         self.output = None
@@ -34,31 +36,34 @@ class ActivationFunction():
         self.output = [np.exp(number) / e_sum for number in input_tensor]
 
 
-class Loss_CategoricalCrossentropy(Loss):
+class Loss1:
 
-    def forward(self, y_pred, y_true):
-        samples = len(y_pred)
-        # Clip data to prevent division by 0
-        # Clip both sides to not drag mean towards any value
-        y_pred_clipped = np.clip(y_pred, 1e-7, 1 - 1e-7)
+    def average_loss(self, loss):
+        return np.mean(loss)
 
-        # Only if categorical labels
-        if len(y_true.shape) == 1:
-            correct_confidences = y_pred_clipped[range(samples), y_true]
+    def categorical_loss(self, true_value, predicted_value):
 
-        # One-hot encoded labels
-        elif len(y_true.shape) == 2:
-            correct_confidences = np.sum(y_pred_clipped * y_true, axis=1)
+        # Prevent divide by 0
+        predicted_value = np.clip(predicted_value, 1e-7, 1 - 1e-7)
 
+        # If the true labels are not encoded
+        if len(true_value.shape) == 1:
+            correct_confidences = predicted_value[range(len(predicted_value)),
+                                                  true_value]
+        # If the true labels are encoded
+        if len(true_value.shape) == 2:
+            correct_confidences = np.sum(true_value * predicted_value, axis=1)
         negative_log_likelihoods = -np.log(correct_confidences)
-        return negative_log_likelihoods
+        return self.average_loss(negative_log_likelihoods)
 
 
-softmax_outputs = np.array([[0.7, 0.1, 0.2], [0.1, 0.5, 0.4],
-                            [0.02, 0.9, 0.08]])
-
-class_targets = [0, 1, 1]
-
-neg_log = -np.log(softmax_outputs[range(len(softmax_outputs)), class_targets])
-average_loss = np.mean(neg_log)
-print(average_loss)
+if __name__ == "__main__":
+    X, y = spiral_data(samples=2, classes=4)
+    layer1 = Dense(2, 3)
+    layer1.forward(X)
+    layer2 = Dense(3, 6)
+    layer2.forward(layer1.output)
+    activation = ActivationFunction()
+    activation.softmax_activation(layer2.output)
+    loss = Loss1()
+    cate_loss = loss.categorical_loss(y, activation.output)
