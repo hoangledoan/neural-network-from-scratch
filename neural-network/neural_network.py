@@ -59,11 +59,12 @@ class Loss1:
 
 if __name__ == "__main__":
     X, y = spiral_data(samples=2, classes=4)
-    layer1 = Dense(2, 3)
+    layer1 = Dense(2, 5)
     layer1.forward(X)
-    layer2 = Dense(3, 6)
+    layer2 = Dense(5, 10)
     layer2.forward(layer1.output)
     activation = ActivationFunction()
     activation.softmax_activation(layer2.output)
     loss = Loss1()
     cate_loss = loss.categorical_loss(y, activation.output)
+    print(cate_loss)
