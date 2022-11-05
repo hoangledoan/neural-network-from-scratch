@@ -74,7 +74,7 @@ if __name__ == "__main__":
     activation = ActivationFunction()
     activation.softmax_activation(layer2.output)
     layer2.backward(layer2.output)
-    # loss = Loss1()
+    loss = Loss1()
     # cate_loss = loss.categorical_loss(y, activation.output)
     # print(cate_loss)
     print(layer2.dw)
