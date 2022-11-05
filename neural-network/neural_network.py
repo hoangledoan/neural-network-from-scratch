@@ -11,9 +11,17 @@ class Dense:
         self.weights = np.random.randn(n_inputs, n_neurons)
         self.biases = np.zeros((1, n_neurons))
         self.output = None
+        self.input = None
+        self.dweights = None
+        self.dbiases = None
 
     def forward(self, inputs_tensor) -> None:
+        self.input = inputs_tensor
         self.output = np.dot(inputs_tensor, self.weights) + self.biases
+
+    def backward(self, dvalues):
+        self.dweights = np.dot(self.input.T, dvalues)
+        self.dbiases = np.sum(dvalues, axis=0)
 
 
 class ActivationFunction:
@@ -65,6 +73,8 @@ if __name__ == "__main__":
     layer2.forward(layer1.output)
     activation = ActivationFunction()
     activation.softmax_activation(layer2.output)
-    loss = Loss1()
-    cate_loss = loss.categorical_loss(y, activation.output)
-    print(cate_loss)
+    layer2.backward(layer2.output)
+    # loss = Loss1()
+    # cate_loss = loss.categorical_loss(y, activation.output)
+    # print(cate_loss)
+    print(layer2.dw)
